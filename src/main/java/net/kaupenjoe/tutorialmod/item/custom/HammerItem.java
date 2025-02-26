@@ -1,9 +1,8 @@
 package net.kaupenjoe.tutorialmod.item.custom;
 
 import net.kaupenjoe.tutorialmod.item.ModItems;
-import net.kaupenjoe.tutorialmod.particle.ModParticles;
+import net.kaupenjoe.tutorialmod.entity.custom.TomahawkProjectileEntity;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -19,6 +18,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 public class HammerItem extends Item {
+    private static final int MAX_CHARGE_TIME = 20;
+    private int chargeTime = 0;
+
     public HammerItem(Properties pProperties) {
         super(pProperties);
     }
@@ -42,6 +44,7 @@ public class HammerItem extends Item {
                 enableFlight(player, world);
                 player.sendSystemMessage(Component.literal("Flight Enabled!").withStyle(ChatFormatting.GREEN));
             }
+            
 
             return InteractionResultHolder.sidedSuccess(itemStack, world.isClientSide());
         }
@@ -94,6 +97,20 @@ public class HammerItem extends Item {
                 player.getX() + xOffset, player.getY(), player.getZ() + zOffset, 
                 3, 0, 0, 0, 0);
         }
+    }
+
+    private void spawnProjectile(Level world, Player player) {
+        // Create a new instance of the custom projectile entity
+        TomahawkProjectileEntity tomahawk = new TomahawkProjectileEntity(player, world);
+    
+        // Set the position of the projectile to the player's position
+        tomahawk.setPos(player.getX(), player.getY() + player.getEyeHeight(), player.getZ());
+    
+        // Set the motion of the projectile based on the player's look vector
+        tomahawk.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 1.5F, 1.0F);
+    
+        // Add the projectile to the world
+        world.addFreshEntity(tomahawk);
     }
     
 }
